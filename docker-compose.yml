@@ -3,8 +3,6 @@
     container_name: ecosensor-db
     image: ghcr.io/emp-projects/docker-postgis:main
     profiles: ["all", "db"]
-    env_file:
-      - .env.database
     environment:
       POSTGRES_HOST_AUTH_METHOD: md5
       PGPORT: 5432
@@ -30,8 +28,6 @@
     container_name: ecosensor-osm2pgsql
     image: ghcr.io/emp-projects/docker-osm2pgsql:main
     profiles: ["all", "db"]
-    env_file:
-      - .env.osm2pgsql
     depends_on:
       ecosensor-osm2pg-db:
         condition: service_healthy
@@ -52,12 +48,6 @@
     image: ghcr.io/emp-projects/ecosensor:master
     profiles: ["all", "db"]
     restart: always
-    env_file:
-      - .env.database
-      - .env.docker
-      - .env.openmeteo
-      - .env.backend
-      - .env.osm2pgsql
     ports:
       - ${ECOSENSOR_PORT}:80
     depends_on:
@@ -71,8 +61,6 @@
     container_name: ecosensor-osm2pg-db
     image: postgis/postgis:16-3.4
     profiles: ["all", "db"]
-    env_file:
-      - .env.osm2pgsql
     environment:
       POSTGRES_HOST_AUTH_METHOD: md5
       PGPORT: 5433
@@ -97,8 +85,6 @@
   ecosensor-open-meteo-api:
     image: ghcr.io/open-meteo/open-meteo
     container_name: ecosensor-openmeteo-api
-    env_file:
-      - .env.openmeteo
     profiles: ["all", "db"]
     ports:
       - ${OPEN_METEO_PORT}:8080
@@ -112,8 +98,6 @@
   ecosensor-open-meteo-sync:
     image: ghcr.io/open-meteo/open-meteo
     container_name: ecosensor-openmeteo-sync
-    env_file:
-      - .env.openmeteo
     profiles: ["all", "db", "be", "openmeteo", "stack"]
     command: sync ${OPEN_METEO_MODELS} ${OPEN_METEO_VARIABLES} --past-days ${OPEN_METEO_MAX_AGE_DAYS} --repeat-interval ${OPEN_METEO_REPEAT_INTERVAL} --concurrent ${OPEN_METEO_CONCURRENT}
     volumes:
@@ -128,8 +112,6 @@
     container_name: ecosensor-istat-db
     profiles: ["all", "db"]
     image: postgis/postgis:16-3.4
-    env_file:
-      - .env.istat
     environment:
       POSTGRES_HOST_AUTH_METHOD: md5
       PGPORT: 5434
@@ -155,8 +137,6 @@
     container_name: ecosensor-istat-import
     profiles: ["all", "db"]
     image: ghcr.io/emp-projects/docker-istat:main
-    env_file:
-      - .env.istat
     depends_on:
       ecosensor-istat-db:
         condition: service_healthy

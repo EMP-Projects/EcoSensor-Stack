@@ -4,4 +4,4 @@ openmeteo-data/
 istat-data/
 .idea/
 .DS_Store
-.env.*
+.env
