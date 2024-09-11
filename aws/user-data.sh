@@ -43,3 +43,9 @@ export POSTGRES_OSM_PASS=
 export POSTGRES_OSM_VERSION_TAG=16-3.4
 export POSTGRES_OSM_DB=osm
 export POSTGRES_SCHEMA=public
+
+# Clone repository and build stack
+git clone https://github.com/EMP-Projects/EcoSensor-Stack.git /EcoSensor
+cd EcoSensor
+make refresh
+make stack

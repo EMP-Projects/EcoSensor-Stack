@@ -1,3 +1,6 @@
+refresh:
+	docker-compose down -rmi all
+
 stack-db:
 	docker compose --env-file .env.stack -f docker-compose.yml -p ecosensor --profile db down
 	docker compose --env-file .env.stack -f docker-compose.yml -p ecosensor --profile db up -d
