@@ -1,0 +1,7 @@
+osm-data/
+ecosensor-data/
+openmeteo-data/
+istat-data/
+.idea/
+.DS_Store
+.env.*
