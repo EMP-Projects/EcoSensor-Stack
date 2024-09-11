@@ -2,7 +2,7 @@
   ecosensor-db:
     container_name: ecosensor-db
     image: ghcr.io/emp-projects/docker-postgis:main
-    profiles: [ "all", "db", "be", "stack" ]
+    profiles: ["all", "db"]
     env_file:
       - .env.database
     environment:
@@ -29,7 +29,7 @@
   ecosensor-osm2pgsql:
     container_name: ecosensor-osm2pgsql
     image: ghcr.io/emp-projects/docker-osm2pgsql:main
-    profiles: [ "all", "db", "be", "osm", "stack" ]
+    profiles: ["all", "db"]
     env_file:
       - .env.osm2pgsql
     depends_on:
@@ -50,7 +50,7 @@
   ecosensor-backend:
     container_name: ecosensor-backend
     image: ghcr.io/emp-projects/ecosensor:master
-    profiles: [ "all", "be" ]
+    profiles: ["all", "db"]
     restart: always
     env_file:
       - .env.database
@@ -70,7 +70,7 @@
   ecosensor-osm2pg-db:
     container_name: ecosensor-osm2pg-db
     image: postgis/postgis:16-3.4
-    profiles: ["all", "db", "be", "stack"]
+    profiles: ["all", "db"]
     env_file:
       - .env.osm2pgsql
     environment:
@@ -99,7 +99,7 @@
     container_name: ecosensor-openmeteo-api
     env_file:
       - .env.openmeteo
-    profiles: ["all", "db", "be", "openmeteo", "stack"]
+    profiles: ["all", "db"]
     ports:
       - ${OPEN_METEO_PORT}:8080
     command: serve
@@ -126,7 +126,7 @@
         
   ecosensor-istat-db:
     container_name: ecosensor-istat-db
-    profiles: ["all", "db", "be", "stack"]
+    profiles: ["all", "db"]
     image: postgis/postgis:16-3.4
     env_file:
       - .env.istat
@@ -153,7 +153,7 @@
 
   ecosensor-istat-ogr2ogr:
     container_name: ecosensor-istat-import
-    profiles: ["all", "db", "be", "stack"]
+    profiles: ["all", "db"]
     image: ghcr.io/emp-projects/docker-istat:main
     env_file:
       - .env.istat
