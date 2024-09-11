@@ -98,7 +98,7 @@
   ecosensor-open-meteo-sync:
     image: ghcr.io/open-meteo/open-meteo
     container_name: ecosensor-openmeteo-sync
-    profiles: ["all", "db", "be", "openmeteo", "stack"]
+    profiles: ["all", "db"]
     command: sync ${OPEN_METEO_MODELS} ${OPEN_METEO_VARIABLES} --past-days ${OPEN_METEO_MAX_AGE_DAYS} --repeat-interval ${OPEN_METEO_REPEAT_INTERVAL} --concurrent ${OPEN_METEO_CONCURRENT}
     volumes:
       - ./openmeteo-data/openmeteo:/app/data
@@ -152,7 +152,7 @@
   ecosensor-nginx:
     container_name: ecosensor-nginx
     image: nginx:latest
-    profiles: ["all", "web"]
+    profiles: ["all"]
     ports:
       - "80:80"
     volumes:
