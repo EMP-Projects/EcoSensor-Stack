@@ -1,10 +1,4 @@
 #!/bin/bash
-sudo yum update
-sudo yum install -y git yum-utils
-sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo 
-sudo yum install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-sudo systemctl start docker
-
 
 # export ENV variables
 # istat container
@@ -44,8 +38,26 @@ export POSTGRES_OSM_VERSION_TAG=16-3.4
 export POSTGRES_OSM_DB=osm
 export POSTGRES_SCHEMA=public
 
+sudo yum update
+sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo 
+sudo yum install -y git yum-utils docker
+
+sudo usermod -a -G docker ec2-user
+id ec2-user
+# Reload a Linux user's group assignments to docker w/o logout
+newgrp docker
+
+sudo wget https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m) 
+sudo mv docker-compose-$(uname -s)-$(uname -m) /usr/local/bin/docker-compose
+sudo chmod -v +x /usr/local/bin/docker-compose
+
+sudo systemctl enable docker.service
+sudo systemctl start docker.service
+
 # Clone repository and build stack
 git clone https://github.com/EMP-Projects/EcoSensor-Stack.git /EcoSensor
 cd EcoSensor
-make refresh
-make stack
+
+docker-compose rm -f
+docker-compose pull
+docker-compose up -d

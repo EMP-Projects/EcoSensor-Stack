@@ -169,6 +169,21 @@
     networks:
         - ecosensor-network
 
+  ecosensor-nginx:
+    container_name: ecosensor-nginx
+    image: nginx:latest
+    profiles: ["all", "web"]
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/html:/usr/share/nginx/html:ro
+    depends_on:
+      ecosensor-backend:
+        condition: service_healthy
+    networks:
+      - ecosensor-network
+
 networks:
   ecosensor-network:
     name: ecosensor
@@ -176,7 +191,7 @@ networks:
     ipam:
       driver: default
       config:
-        - subnet: 172.16.60.0/24
+        - subnet: 172.16.1.0/24
 
 volumes:
   db:

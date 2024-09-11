@@ -1,13 +1,5 @@
 # EcoSensor stack
 
-To run the entire EcoSensor stack you must execute the following command
+Ecosensor stack for an AWS EC2 instance that starts the script `aws/user-data.sh`.
 
-```bash
-make stack
-```
-
-To run the entire stack excluding the backend for development environment:
-
-```bash
-make stack-db
-```
+Before starting the stack, if you need to use docker-compose you need to copy all _env.*.template_ files into their respective _.env.*.template_ files.
