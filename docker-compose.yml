@@ -46,7 +46,7 @@
   ecosensor-backend:
     container_name: ecosensor-backend
     image: ghcr.io/emp-projects/ecosensor:master
-    profiles: ["all", "db"]
+    profiles: ["all"]
     restart: always
     ports:
       - ${ECOSENSOR_PORT}:80
