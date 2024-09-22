@@ -11,6 +11,7 @@ export POSTGRES_ISTAT_DB=istat
 # backend container
 export ECOSENSOR_PORT=15435
 export ECOSENSOR_OPENMETEO_API=http://ecosensor-open-meteo-api:8080
+export AWS_TOPIC_ARN=
 
 # database
 export POSTGRES_HOST=localhost
