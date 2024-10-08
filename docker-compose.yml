@@ -48,10 +48,32 @@
     image: ghcr.io/emp-projects/ecosensor:master
     profiles: ["all"]
     restart: always
+    environment:
+      POSTGRES_OSM_HOST: ecosensor-osm2pg-db
+      POSTGRES_OSM_DB: ${POSTGRES_OSM_DB}
+      POSTGRES_OSM_USER: ${POSTGRES_OSM_USER}
+      POSTGRES_OSM_PASS: ${POSTGRES_OSM_PASS}
+      POSTGRES_OSM_PORT: 5433
+      ECOSENSOR_OPENMETEO_API: http://ecosensor-open-meteo-api:8080
+      AWS_TOPIC_ARN: ${AWS_TOPIC_ARN}
+      POSTGRES_ISTAT_HOST: ecosensor-istat-db
+      POSTGRES_ISTAT_PORT: 5434
+      POSTGRES_ISTAT_DB: ${POSTGRES_ISTAT_DB}
+      POSTGRES_ISTAT_USER: ${POSTGRES_ISTAT_USER}
+      POSTGRES_ISTAT_PASS: ${POSTGRES_ISTAT_PASS}
+      POSTGRES_HOST: ecosensor-db
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASS: ${POSTGRES_PASS}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - ${ECOSENSOR_PORT}:80
     depends_on:
       ecosensor-db:
+        condition: service_healthy
+      ecosensor-osm2pg-db:
+        condition: service_healthy
+      ecosensor-istat-db:
         condition: service_healthy
     networks:
       - ecosensor-network
