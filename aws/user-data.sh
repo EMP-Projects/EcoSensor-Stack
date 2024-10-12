@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Create .env file in the home directory
-cat <<EOF > ~/.env
+cat <<EOF > $HOME/.env
 ECOSENSOR_PORT=15436
 ECOSENSOR_OPENMETEO_API=http://ecosensor-open-meteo-api:8080
 AWS_TOPIC_ARN=
@@ -11,9 +11,6 @@ POSTGRES_ISTAT_PORT=15434
 POSTGRES_ISTAT_USER=istat
 POSTGRES_ISTAT_PASS=
 POSTGRES_ISTAT_DB=istat
-ECOSENSOR_PORT=15435
-ECOSENSOR_OPENMETEO_API=http://ecosensor-open-meteo-api:8080
-AWS_TOPIC_ARN=
 POSTGRES_HOST=localhost
 POSTGRES_PORT=15432
 POSTGRES_USER=ecosensor
@@ -50,7 +47,7 @@ sudo systemctl enable docker.service
 sudo systemctl start docker.service
 
 # Clone repository and build stack
-git clone https://github.com/EMP-Projects/EcoSensor-Stack.git ~/ecosensor-stack
+git clone https://github.com/EMP-Projects/EcoSensor-Stack.git $HOME/ecosensor-stack
 cd ecosensor-stack
 
 docker-compose rm -f
