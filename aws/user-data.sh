@@ -1,6 +1,11 @@
 #!/bin/bash
 
 # export ENV variables
+export ECOSENSOR_PORT=15436
+export ECOSENSOR_OPENMETEO_API=http://ecosensor-open-meteo-api:8080
+export AWS_TOPIC_ARN=
+export AWS_BUCKET_NAME=
+
 # istat container
 export POSTGRES_ISTAT_HOST=localhost
 export POSTGRES_ISTAT_PORT=15434
@@ -18,7 +23,6 @@ export POSTGRES_HOST=localhost
 export POSTGRES_PORT=15432
 export POSTGRES_USER=ecosensor
 export POSTGRES_PASS=
-export POSTGRES_VERSION_TAG=16-3.4
 export POSTGRES_DB=ecosensor
 export POSTGRES_SCHEMA=public
 
@@ -35,9 +39,7 @@ export POSTGRES_OSM_HOST=localhost
 export POSTGRES_OSM_PORT=15432
 export POSTGRES_OSM_USER=osm
 export POSTGRES_OSM_PASS=
-export POSTGRES_OSM_VERSION_TAG=16-3.4
 export POSTGRES_OSM_DB=osm
-export POSTGRES_SCHEMA=public
 
 sudo yum update
 sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo 
