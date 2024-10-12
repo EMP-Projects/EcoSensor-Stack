@@ -1,0 +1,24 @@
+{
+    "name": "EcoSensor-Stack Dev Container",
+    "image": "mcr.microsoft.com/vscode/devcontainers/base:ubuntu-20.04",
+    "features": {
+        "ghcr.io/devcontainers/features/docker-in-docker:1": {}
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python",
+                "ms-azuretools.vscode-docker",
+                "esbenp.prettier-vscode"
+            ],
+            "settings": {
+                "terminal.integrated.shell.linux": "/bin/bash"
+            }
+        }
+    },
+    "postCreateCommand": "pip install -r requirements.txt",
+    "mounts": [
+        "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
+    ],
+    "remoteUser": "vscode"
+}
