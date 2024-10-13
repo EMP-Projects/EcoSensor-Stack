@@ -36,7 +36,7 @@ POSTGRES_PORT=15432
 POSTGRES_USER=ecosensor
 POSTGRES_PASS=
 POSTGRES_DB=ecosensor
-POSTGRES_SCHEMA=public
+POSTGRES_INITDB_ARGS="-c shared_buffers=1GB -c work_mem=50MB -c maintenance_work_mem=2GB -c autovacuum_work_mem=1GB -c wal_level=minimal -c checkpoint_completion_target=0.9 -c max_wal_senders=0 -c random_page_cost=1.0"
 OPEN_METEO_MODELS=ncep_gfs013,copernicus_era5,copernicus_dem90,cams_europe
 OPEN_METEO_VARIABLES=temperature_2m,precipitation,carbon_monoxide,nitrogen_dioxide,ozone,pm10,pm2_5
 OPEN_METEO_MAX_AGE_DAYS=3

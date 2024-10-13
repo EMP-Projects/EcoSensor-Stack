@@ -5,15 +5,15 @@
     profiles: ["all", "db"]
     environment:
       POSTGRES_HOST_AUTH_METHOD: md5
-      PGPORT: 5432
+      PGPORT: ${POSTGRES_PORT}
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASS}
-      POSTGRES_INITDB_ARGS: "-c shared_buffers=1GB -c work_mem=50MB -c maintenance_work_mem=10GB -c autovacuum_work_mem=2GB -c wal_level=minimal -c checkpoint_completion_target=0.9 -c max_wal_senders=0 -c random_page_cost=1.0 -c max_wal_size=10GB"
+      POSTGRES_INITDB_ARGS: ${POSTGRES_INITDB_ARGS}
     ports:
-      - ${POSTGRES_PORT}:5432
+      - 15432:${POSTGRES_PORT}
     healthcheck:
-      test: "PGPASSWORD=${POSTGRES_PASS} pg_isready -h 127.0.0.1 -U ${POSTGRES_USER} -d ${POSTGRES_DB} -p 5432"
+      test: "PGPASSWORD=${POSTGRES_PASS} pg_isready -h 127.0.0.1 -U ${POSTGRES_USER} -d ${POSTGRES_DB} -p ${POSTGRES_PORT}"
       interval: 1m30s
       timeout: 10s
       retries: 3
@@ -37,7 +37,7 @@
       PGDATABASE: ${POSTGRES_OSM_DB}
       PGUSER: ${POSTGRES_OSM_USER}
       PGPASSWORD: ${POSTGRES_OSM_PASS}
-      PGPORT: 5433
+      PGPORT: ${POSTGRES_OSM_PORT}
     volumes:
       - ./osm-data/osm:/osm
     networks:
@@ -50,15 +50,15 @@
     profiles: ["all", "db"]
     environment:
       POSTGRES_HOST_AUTH_METHOD: md5
-      PGPORT: 5433
+      PGPORT: ${POSTGRES_OSM_PORT}
       POSTGRES_DB: ${POSTGRES_OSM_DB}
       POSTGRES_USER: ${POSTGRES_OSM_USER}
       POSTGRES_PASSWORD: ${POSTGRES_OSM_PASS}
       POSTGRES_INITDB_ARGS: ${POSTGRES_INITDB_ARGS}
     ports:
-      - ${POSTGRES_OSM_PORT}:5433
+      - 15433:${POSTGRES_OSM_PORT}
     healthcheck:
-      test: "PGPASSWORD=${POSTGRES_OSM_PASS} pg_isready -h 127.0.0.1 -U ${POSTGRES_OSM_USER} -d ${POSTGRES_OSM_DB} -p 5433"
+      test: "PGPASSWORD=${POSTGRES_OSM_PASS} pg_isready -h 127.0.0.1 -U ${POSTGRES_OSM_USER} -d ${POSTGRES_OSM_DB} -p ${POSTGRES_OSM_PORT}"
       interval: 1m30s
       timeout: 10s
       retries: 3
@@ -101,14 +101,14 @@
     image: postgis/postgis:16-3.4
     environment:
       POSTGRES_HOST_AUTH_METHOD: md5
-      PGPORT: 5434
+      PGPORT: ${POSTGRES_ISTAT_PORT}
       POSTGRES_DB: ${POSTGRES_ISTAT_DB}
       POSTGRES_USER: ${POSTGRES_ISTAT_USER}
       POSTGRES_PASSWORD: ${POSTGRES_ISTAT_PASS}
     ports:
-      - ${POSTGRES_ISTAT_PORT}:5434
+      - 15434:${POSTGRES_ISTAT_PORT}
     healthcheck:
-      test: "PGPASSWORD=${POSTGRES_ISTAT_PASS} pg_isready -h 127.0.0.1 -U ${POSTGRES_ISTAT_USER} -d ${POSTGRES_ISTAT_DB} -p 5434"
+      test: "PGPASSWORD=${POSTGRES_ISTAT_PASS} pg_isready -h 127.0.0.1 -U ${POSTGRES_ISTAT_USER} -d ${POSTGRES_ISTAT_DB} -p ${POSTGRES_ISTAT_PORT}"
       interval: 1m30s
       timeout: 10s
       retries: 3
@@ -127,7 +127,7 @@
       ecosensor-istat-db:
         condition: service_healthy
     environment:
-        PGPORT: 5434
+        PGPORT: ${POSTGRES_ISTAT_PORT}
         PGHOST: ecosensor-istat-db
         PGDB: ${POSTGRES_ISTAT_DB}
         PGUSER: ${POSTGRES_ISTAT_USER}
@@ -145,17 +145,17 @@
       POSTGRES_OSM_DB: ${POSTGRES_OSM_DB}
       POSTGRES_OSM_USER: ${POSTGRES_OSM_USER}
       POSTGRES_OSM_PASS: ${POSTGRES_OSM_PASS}
-      POSTGRES_OSM_PORT: 5433
-      ECOSENSOR_OPENMETEO_API: http://ecosensor-open-meteo-api:8080
+      POSTGRES_OSM_PORT: ${POSTGRES_OSM_PORT}
+      ECOSENSOR_OPENMETEO_API: ${ECOSENSOR_OPENMETEO_API}
       AWS_BUCKET_NAME: ${AWS_BUCKET_NAME}
       AWS_TOPIC_ARN: ${AWS_TOPIC_ARN}
       POSTGRES_ISTAT_HOST: ecosensor-istat-db
-      POSTGRES_ISTAT_PORT: 5434
+      POSTGRES_ISTAT_PORT: ${POSTGRES_ISTAT_PORT}
       POSTGRES_ISTAT_DB: ${POSTGRES_ISTAT_DB}
       POSTGRES_ISTAT_USER: ${POSTGRES_ISTAT_USER}
       POSTGRES_ISTAT_PASS: ${POSTGRES_ISTAT_PASS}
       POSTGRES_HOST: ecosensor-db
-      POSTGRES_PORT: 5432
+      POSTGRES_PORT: ${POSTGRES_PORT}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASS: ${POSTGRES_PASS}
       POSTGRES_DB: ${POSTGRES_DB}
@@ -168,19 +168,6 @@
         condition: service_healthy
       ecosensor-istat-db:
         condition: service_healthy
-    networks:
-      - ecosensor-network
-
-  ecosensor-nginx:
-    container_name: ecosensor-nginx
-    image: nginx:latest
-    profiles: ["all"]
-    ports:
-      - "80:80"
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./nginx/html:/usr/share/nginx/html:ro
-    restart: always
     networks:
       - ecosensor-network
 
