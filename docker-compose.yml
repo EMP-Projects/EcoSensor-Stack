@@ -37,7 +37,7 @@
       PGDATABASE: ${POSTGRES_OSM_DB}
       PGUSER: ${POSTGRES_OSM_USER}
       PGPASSWORD: ${POSTGRES_OSM_PASS}
-      PGPORT: ${POSTGRES_OSM_PORT}
+      PGPORT: 5433
     volumes:
       - ./osm-data/osm:/osm
     networks:
@@ -54,7 +54,7 @@
       POSTGRES_DB: ${POSTGRES_OSM_DB}
       POSTGRES_USER: ${POSTGRES_OSM_USER}
       POSTGRES_PASSWORD: ${POSTGRES_OSM_PASS}
-      POSTGRES_INITDB_ARGS: "-c shared_buffers=1GB -c work_mem=50MB -c maintenance_work_mem=10GB -c autovacuum_work_mem=2GB -c wal_level=minimal -c checkpoint_completion_target=0.9 -c max_wal_senders=0 -c random_page_cost=1.0"
+      POSTGRES_INITDB_ARGS: ${POSTGRES_INITDB_ARGS}
     ports:
       - ${POSTGRES_OSM_PORT}:5433
     healthcheck:
@@ -105,7 +105,6 @@
       POSTGRES_DB: ${POSTGRES_ISTAT_DB}
       POSTGRES_USER: ${POSTGRES_ISTAT_USER}
       POSTGRES_PASSWORD: ${POSTGRES_ISTAT_PASS}
-      POSTGRES_INITDB_ARGS: "-c shared_buffers=1GB -c work_mem=50MB -c maintenance_work_mem=10GB -c autovacuum_work_mem=2GB -c wal_level=minimal -c checkpoint_completion_target=0.9 -c max_wal_senders=0 -c random_page_cost=1.0"
     ports:
       - ${POSTGRES_ISTAT_PORT}:5434
     healthcheck:
