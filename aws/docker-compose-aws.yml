@@ -2,7 +2,7 @@ services:
   ecosensor-osm2pgsql:
       container_name: ecosensor-osm2pgsql-aws
       image: ghcr.io/emp-projects/docker-osm2pgsql:main
-      command: ./entrypoint.sh ${POSTGRES_HOST} ${POSTGRES_PORT} ${POSTGRES_OSM_USER} ${POSTGRES_OSM_PASS} ${POSTGRES_OSM_DB}
+      command: ./entrypoint.sh localhost 5432 osm osm osm
       restart: always
       environment:
         PGHOST: ${POSTGRES_HOST}
