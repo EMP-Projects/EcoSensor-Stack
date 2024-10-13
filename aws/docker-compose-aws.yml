@@ -1,8 +1,36 @@
 services:
+  ecosensor-osm2pgsql:
+      container_name: ecosensor-osm2pgsql
+      image: ghcr.io/emp-projects/docker-osm2pgsql:main
+      command: ["./entrypoint.sh", "${POSTGRES_HOST}", "${POSTGRES_PORT}", "${POSTGRES_OSM_USER}", "${POSTGRES_OSM_PASS}", "${POSTGRES_OSM_DB}"]
+      restart: always
+      environment:
+        PGHOST: ${POSTGRES_HOST}
+        PGDATABASE: ${POSTGRES_OSM_DB}
+        PGUSER: ${POSTGRES_OSM_USER}
+        PGPASSWORD: ${POSTGRES_OSM_PASS}
+        PGPORT: ${POSTGRES_PORT}
+      volumes:
+        - ./osm-data/osm:/osm
+      networks:
+        - ecosensor-network
+
+  ecosensor-istat-ogr2ogr:
+    container_name: ecosensor-istat-import
+    image: ghcr.io/emp-projects/docker-istat:main
+    command: ["./import.sh", "${POSTGRES_HOST}", "${POSTGRES_PORT}", "${POSTGRES_ISTAT_USER}", "${POSTGRES_ISTAT_PASS}", "${POSTGRES_ISTAT_DB}"]
+    environment:
+        PGPORT: ${POSTGRES_ISTAT_PORT}
+        PGHOST: ${POSTGRES_ISTAT_HOST}
+        PGDB: ${POSTGRES_ISTAT_DB}
+        PGUSER: ${POSTGRES_ISTAT_USER}
+        PGPWD: ${POSTGRES_ISTAT_PASS}
+    networks:
+        - ecosensor-network
+
   ecosensor-backend:
     container_name: ecosensor-backend
     image: ghcr.io/emp-projects/ecosensor:master
-    profiles: ["all"]
     restart: always
     environment:
       POSTGRES_OSM_HOST: ${POSTGRES_HOST}

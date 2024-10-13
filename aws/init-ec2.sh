@@ -38,7 +38,7 @@ sudo systemctl start docker.service
 
 # -----------------------------------
 # Install Open-Meteo-API
-sudo mkdir /root/.gnupg
+sudo mkdir $HOME/.gnupg
 sudo gpg --keyserver hkps://keys.openpgp.org --no-default-keyring --keyring /usr/share/keyrings/openmeteo-archive-keyring.gpg  --recv-keys E6D9BD390F8226AE
 echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/openmeteo-archive-keyring.gpg] https://apt.open-meteo.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/openmeteo-api.list
 
@@ -87,19 +87,5 @@ echo "checkpoint_completion_target=0.9" | sudo tee -a /etc/postgresql/14/main/po
 echo "max_wal_senders=0" | sudo tee -a /etc/postgresql/14/main/postgresql.conf
 echo "random_page_cost=1.0" | sudo tee -a /etc/postgresql/14/main/postgresql.conf
 
-# -----------------------------------
-# install istat data 
-git clone https://github.com/EMP-Projects/docker-istat.git $HOME/docker-istat
-cd $HOME/docker-istat
-chmod +x ./scripts/init.sh
-./scripts/init.sh $POSTGRES_HOST $POSTGRES_PORT $POSTGRES_ISTAT_USER $POSTGRES_ISTAT_PASS $POSTGRES_ISTAT_DB
-
-# -----------------------------------
-# install osm data
-git clone https://github.com/EMP-Projects/docker-osm2pgsql.git $HOME/docker-osm2pgsql
-cd $HOME/docker-osm2pgsql
-chmod +x ./init-ec2-aws.sh
-./init-ec2-aws.sh
-chmod +x ./entrypoint.sh
-./entrypoint.sh $POSTGRES_HOST $POSTGRES_PORT $POSTGRES_OSM_USER $POSTGRES_OSM_PASS $POSTGRES_OSM_DB
-
+# restart postgresql
+sudo systemctl restart postgresql
