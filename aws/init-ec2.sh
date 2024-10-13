@@ -23,7 +23,7 @@ sudo apt install -y git docker.io
 
 # -----------------------------------
 # Install Docker Compose
-sudo usermod -a -G docker ec2-user
+sudo usermod -a -G docker ubuntu
 id ubuntu
 # Reload a Linux user's group assignments to docker w/o logout
 newgrp docker
@@ -98,14 +98,14 @@ echo "random_page_cost=1.0" | sudo tee -a /etc/postgresql/14/main/postgresql.con
 
 # -----------------------------------
 # install istat data 
-git clone git@github.com:EMP-Projects/docker-istat.git $HOME/docker-istat
+git clone https://github.com/EMP-Projects/docker-istat.git $HOME/docker-istat
 cd $HOME/docker-istat
 chmod +x ./scripts/init.sh
 ./scripts/init.sh $POSTGRES_HOST $POSTGRES_PORT $POSTGRES_ISTAT_USER $POSTGRES_ISTAT_PASS $POSTGRES_ISTAT_DB
 
 # -----------------------------------
 # install osm data
-git clone git@github.com:EMP-Projects/docker-osm2pgsql.git $HOME/docker-osm2pgsql
+git clone https://github.com/EMP-Projects/docker-osm2pgsql.git $HOME/docker-osm2pgsql
 cd $HOME/docker-osm2pgsql
 chmod +x ./init-ec2-aws.sh
 ./init-ec2-aws.sh
