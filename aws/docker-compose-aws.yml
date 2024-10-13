@@ -1,6 +1,6 @@
 services:
   ecosensor-osm2pgsql:
-      container_name: ecosensor-osm2pgsql
+      container_name: ecosensor-osm2pgsql-aws
       image: ghcr.io/emp-projects/docker-osm2pgsql:main
       command: ./entrypoint.sh ${POSTGRES_HOST} ${POSTGRES_PORT} ${POSTGRES_OSM_USER} ${POSTGRES_OSM_PASS} ${POSTGRES_OSM_DB}
       restart: always
@@ -16,7 +16,7 @@ services:
         - ecosensor-network
 
   ecosensor-istat-ogr2ogr:
-    container_name: ecosensor-istat-import
+    container_name: ecosensor-istat-import-aws
     image: ghcr.io/emp-projects/docker-istat:main
     command: ["./scripts/import.sh", "${POSTGRES_HOST}", "${POSTGRES_PORT}", "${POSTGRES_ISTAT_USER}", "${POSTGRES_ISTAT_PASS}", "${POSTGRES_ISTAT_DB}"]
     environment:
@@ -29,7 +29,7 @@ services:
         - ecosensor-network
 
   ecosensor-backend:
-    container_name: ecosensor-backend
+    container_name: ecosensor-backend-aws
     image: ghcr.io/emp-projects/ecosensor:master
     restart: always
     environment:
