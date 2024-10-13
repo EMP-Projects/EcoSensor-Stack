@@ -58,16 +58,6 @@ sudo journalctl -u openmeteo-api.service
 # Install and configure postgresql
 sudo apt install -y postgresql postgresql-client postgis
 
-# scrivimi il comando per creare un db e un utente
-# create user and database
-sudo -u ubuntu psql -c "CREATE USER $POSTGRES_OSM_USER WITH PASSWORD $POSTGRES_OSM_PASS;" -d postgres
-sudo -u ubuntu psql -c "CREATE DATABASE $POSTGRES_OSM_DB OWNER $POSTGRES_OSM_USER;" -d postgres
-sudo -u ubuntu psql -c "CREATE USER $POSTGRES_ISTAT_USER WITH PASSWORD $POSTGRES_ISTAT_PASS;" -d postgres
-sudo -u ubuntu psql -c "CREATE DATABASE $POSTGRES_ISTAT_DB OWNER $POSTGRES_ISTAT_USER;" -d postgres
-sudo -u ubuntu psql -c "CREATE USER $POSTGRES_USER WITH PASSWORD '$POSTGRES_PASS';" -d postgres
-sudo -u ubuntu psql -c "CREATE DATABASE $POSTGRES_DB OWNER $POSTGRES_USER;" -d postgres
-
-
 # add extension postgis to the database
 sudo -u ubuntu psql -c "CREATE EXTENSION IF NOT EXISTS postgis;" -d $POSTGRES_OSM_DB
 sudo -u ubuntu psql -c "CREATE EXTENSION IF NOT EXISTS hstore;" -d $POSTGRES_OSM_DB
