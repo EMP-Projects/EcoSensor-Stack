@@ -56,6 +56,7 @@ sudo journalctl -u openmeteo-api.service
 
 # -----------------------------------
 # Install and configure postgresql
+sudo apt update
 sudo apt install -y postgresql postgresql-client postgis
 
 # add extension postgis to the database
