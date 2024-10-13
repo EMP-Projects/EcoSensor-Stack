@@ -18,7 +18,7 @@ services:
   ecosensor-istat-ogr2ogr:
     container_name: ecosensor-istat-import
     image: ghcr.io/emp-projects/docker-istat:main
-    command: ["./import.sh", "${POSTGRES_HOST}", "${POSTGRES_PORT}", "${POSTGRES_ISTAT_USER}", "${POSTGRES_ISTAT_PASS}", "${POSTGRES_ISTAT_DB}"]
+    command: ["./scripts/import.sh", "${POSTGRES_HOST}", "${POSTGRES_PORT}", "${POSTGRES_ISTAT_USER}", "${POSTGRES_ISTAT_PASS}", "${POSTGRES_ISTAT_DB}"]
     environment:
         PGPORT: ${POSTGRES_PORT}
         PGHOST: ${POSTGRES_HOST}
