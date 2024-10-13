@@ -11,7 +11,7 @@ services:
         PGPASSWORD: ${POSTGRES_OSM_PASS}
         PGPORT: ${POSTGRES_PORT}
       volumes:
-        - $HOME/osm-data/osm:/osm
+        - ./osm:/osm
       networks:
         - ecosensor-network
 
