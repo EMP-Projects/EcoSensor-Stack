@@ -1,0 +1,42 @@
+services:
+  ecosensor-backend:
+    container_name: ecosensor-backend
+    image: ghcr.io/emp-projects/ecosensor:master
+    profiles: ["all"]
+    restart: always
+    environment:
+      POSTGRES_OSM_HOST: ${POSTGRES_HOST}
+      POSTGRES_OSM_DB: ${POSTGRES_OSM_DB}
+      POSTGRES_OSM_USER: ${POSTGRES_OSM_USER}
+      POSTGRES_OSM_PASS: ${POSTGRES_OSM_PASS}
+      POSTGRES_OSM_PORT: ${POSTGRES_PORT}
+      ECOSENSOR_OPENMETEO_API: ${ECOSENSOR_OPENMETEO_API}
+      AWS_BUCKET_NAME: ${AWS_BUCKET_NAME}
+      AWS_TOPIC_ARN: ${AWS_TOPIC_ARN}
+      POSTGRES_ISTAT_HOST: ${POSTGRES_HOST}
+      POSTGRES_ISTAT_PORT: ${POSTGRES_PORT}
+      POSTGRES_ISTAT_DB: ${POSTGRES_ISTAT_DB}
+      POSTGRES_ISTAT_USER: ${POSTGRES_ISTAT_USER}
+      POSTGRES_ISTAT_PASS: ${POSTGRES_ISTAT_PASS}
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_PORT: ${POSTGRES_PORT}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASS: ${POSTGRES_PASS}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - ${ECOSENSOR_PORT}:80
+    networks:
+      - ecosensor-network
+
+networks:
+  ecosensor-network:
+    name: ecosensor
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.16.1.0/24
+
+volumes:
+  db:
+    driver: local

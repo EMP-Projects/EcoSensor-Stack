@@ -1,10 +1,30 @@
 #!/bin/bash
 
-sudo yum update
-sudo yum install -y git docker
+# Database
+export POSTGRES_HOST=localhost
+export POSTGRES_PORT=5432
+export POSTGRES_USER=ecosensor
+export POSTGRES_PASS=
+export POSTGRES_DB=ecosensor
 
+# Database Istat
+export POSTGRES_ISTAT_USER=istat
+export POSTGRES_ISTAT_PASS=
+export POSTGRES_ISTAT_DB=istat
+
+# Database Osm2pgsql
+export POSTGRES_OSM_USER=osm
+export POSTGRES_OSM_PASS=
+export POSTGRES_OSM_DB=osm
+
+# Update and install packages
+sudo apt update
+sudo apt install -y git docker.io
+
+# -----------------------------------
+# Install Docker Compose
 sudo usermod -a -G docker ec2-user
-id ec2-user
+id ubuntu
 # Reload a Linux user's group assignments to docker w/o logout
 newgrp docker
 
@@ -16,36 +36,79 @@ chmod +x $DOCKER_CONFIG/cli-plugins/docker-compose
 sudo systemctl enable docker.service
 sudo systemctl start docker.service
 
-# Clone repository and build stack
-git clone https://github.com/EMP-Projects/EcoSensor-Stack.git $HOME/ecosensor-stack
-cd ecosensor-stack
+# -----------------------------------
+# Install Open-Meteo-API
+sudo mkdir /root/.gnupg
+sudo gpg --keyserver hkps://keys.openpgp.org --no-default-keyring --keyring /usr/share/keyrings/openmeteo-archive-keyring.gpg  --recv-keys E6D9BD390F8226AE
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/openmeteo-archive-keyring.gpg] https://apt.open-meteo.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/openmeteo-api.list
 
-# Create .env file in the project directory
-cat <<EOF > $HOME/ecosensor-stack/.env
-ECOSENSOR_PORT=15436
-ECOSENSOR_OPENMETEO_API=http://ecosensor-open-meteo-api:8080
-AWS_TOPIC_ARN=
-AWS_BUCKET_NAME=
-POSTGRES_ISTAT_HOST=localhost
-POSTGRES_ISTAT_PORT=15434
-POSTGRES_ISTAT_USER=istat
-POSTGRES_ISTAT_PASS=
-POSTGRES_ISTAT_DB=istat
-POSTGRES_HOST=localhost
-POSTGRES_PORT=15432
-POSTGRES_USER=ecosensor
-POSTGRES_PASS=
-POSTGRES_DB=ecosensor
-POSTGRES_INITDB_ARGS="-c shared_buffers=1GB -c work_mem=50MB -c maintenance_work_mem=2GB -c autovacuum_work_mem=1GB -c wal_level=minimal -c checkpoint_completion_target=0.9 -c max_wal_senders=0 -c random_page_cost=1.0"
-OPEN_METEO_MODELS=ncep_gfs013,copernicus_era5,copernicus_dem90,cams_europe
-OPEN_METEO_VARIABLES=temperature_2m,precipitation,carbon_monoxide,nitrogen_dioxide,ozone,pm10,pm2_5
-OPEN_METEO_MAX_AGE_DAYS=3
-OPEN_METEO_REPEAT_INTERVAL=5
-OPEN_METEO_CONCURRENT=4
-OPEN_METEO_PORT=15434
-POSTGRES_OSM_HOST=localhost
-POSTGRES_OSM_PORT=15432
-POSTGRES_OSM_USER=osm
-POSTGRES_OSM_PASS=
-POSTGRES_OSM_DB=osm
-EOF
+sudo apt update
+sudo apt install -y openmeteo-api
+
+# Download the latest ECMWF IFS 0.4° open-data forecast for temperature (50 MB)
+sudo chown -R $(id -u):$(id -g) /var/lib/openmeteo-api
+cd /var/lib/openmeteo-api
+openmeteo-api sync ncep_gfs013,copernicus_era5,copernicus_dem90,cams_europe temperature_2m,precipitation,carbon_monoxide,nitrogen_dioxide,ozone,pm10,pm2_5
+
+sudo systemctl status openmeteo-api
+sudo systemctl restart openmeteo-api
+sudo journalctl -u openmeteo-api.service
+
+# -----------------------------------
+# Install and configure postgresql
+sudo apt install -y postgresql postgresql-client postgis
+
+# scrivimi il comando per creare un db e un utente
+# create user and database
+sudo -u ubuntu psql -c "CREATE USER $POSTGRES_OSM_USER WITH PASSWORD $POSTGRES_OSM_PASS;" -d postgres
+sudo -u ubuntu psql -c "CREATE DATABASE $POSTGRES_OSM_DB OWNER $POSTGRES_OSM_USER;" -d postgres
+sudo -u ubuntu psql -c "CREATE USER $POSTGRES_ISTAT_USER WITH PASSWORD $POSTGRES_ISTAT_PASS;" -d postgres
+sudo -u ubuntu psql -c "CREATE DATABASE $POSTGRES_ISTAT_DB OWNER $POSTGRES_ISTAT_USER;" -d postgres
+sudo -u ubuntu psql -c "CREATE USER $POSTGRES_USER WITH PASSWORD '$POSTGRES_PASS';" -d postgres
+sudo -u ubuntu psql -c "CREATE DATABASE $POSTGRES_DB OWNER $POSTGRES_USER;" -d postgres
+
+
+# add extension postgis to the database
+sudo -u ubuntu psql -c "CREATE EXTENSION IF NOT EXISTS postgis;" -d $POSTGRES_OSM_DB
+sudo -u ubuntu psql -c "CREATE EXTENSION IF NOT EXISTS hstore;" -d $POSTGRES_OSM_DB
+sudo -u ubuntu psql -c "CREATE EXTENSION IF NOT EXISTS pgrouting;" -d $POSTGRES_OSM_DB
+sudo -u ubuntu psql -c "CREATE EXTENSION IF NOT EXISTS postgis_raster;" -d $POSTGRES_OSM_DB
+sudo -u ubuntu psql -c "CREATE EXTENSION IF NOT EXISTS postgis_topology WITH SCHEMA topology;" -d $POSTGRES_OSM_DB
+
+sudo -u ubuntu psql -c "CREATE EXTENSION IF NOT EXISTS postgis;" -d $POSTGRES_ISTAT_DB
+sudo -u ubuntu psql -c "CREATE EXTENSION IF NOT EXISTS hstore;" -d $POSTGRES_ISTAT_DB
+sudo -u ubuntu psql -c "CREATE EXTENSION IF NOT EXISTS postgis_topology WITH SCHEMA topology;" -d $POSTGRES_ISTAT_DB
+
+sudo -u ubuntu psql -c "CREATE EXTENSION IF NOT EXISTS postgis;" -d $POSTGRES_DB
+sudo -u ubuntu psql -c "CREATE EXTENSION IF NOT EXISTS hstore;" -d $POSTGRES_DB
+sudo -u ubuntu psql -c "CREATE EXTENSION IF NOT EXISTS pgrouting;" -d $POSTGRES_DB
+sudo -u ubuntu psql -c "CREATE EXTENSION IF NOT EXISTS postgis_raster;" -d $POSTGRES_DB
+sudo -u ubuntu psql -c "CREATE EXTENSION IF NOT EXISTS postgis_topology WITH SCHEMA topology;" -d $POSTGRES_DB
+
+# dimmi il comando per aggiungere queste opzioni di configurazione a postgresql.conf
+# add configuration options to postgresql.conf
+echo "shared_buffers=1GB" | sudo tee -a /etc/postgresql/14/main/postgresql.conf
+echo "work_mem=50MB" | sudo tee -a /etc/postgresql/14/main/postgresql.conf
+echo "maintenance_work_mem=2GB" | sudo tee -a /etc/postgresql/14/main/postgresql.conf
+echo "autovacuum_work_mem=1GB" | sudo tee -a /etc/postgresql/14/main/postgresql.conf
+echo "wal_level=minimal" | sudo tee -a /etc/postgresql/14/main/postgresql.conf
+echo "checkpoint_completion_target=0.9" | sudo tee -a /etc/postgresql/14/main/postgresql.conf
+echo "max_wal_senders=0" | sudo tee -a /etc/postgresql/14/main/postgresql.conf
+echo "random_page_cost=1.0" | sudo tee -a /etc/postgresql/14/main/postgresql.conf
+
+# -----------------------------------
+# install istat data 
+git clone git@github.com:EMP-Projects/docker-istat.git $HOME/docker-istat
+cd $HOME/docker-istat
+chmod +x ./scripts/init.sh
+./scripts/init.sh $POSTGRES_HOST $POSTGRES_PORT $POSTGRES_ISTAT_USER $POSTGRES_ISTAT_PASS $POSTGRES_ISTAT_DB
+
+# -----------------------------------
+# install osm data
+git clone git@github.com:EMP-Projects/docker-osm2pgsql.git $HOME/docker-osm2pgsql
+cd $HOME/docker-osm2pgsql
+chmod +x ./init-ec2-aws.sh
+./init-ec2-aws.sh
+chmod +x ./entrypoint.sh
+./entrypoint.sh $POSTGRES_HOST $POSTGRES_PORT $POSTGRES_OSM_USER $POSTGRES_OSM_PASS $POSTGRES_OSM_DB
+
