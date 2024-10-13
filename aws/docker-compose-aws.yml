@@ -21,7 +21,7 @@ services:
     command: ["./import.sh", "${POSTGRES_HOST}", "${POSTGRES_PORT}", "${POSTGRES_ISTAT_USER}", "${POSTGRES_ISTAT_PASS}", "${POSTGRES_ISTAT_DB}"]
     environment:
         PGPORT: ${POSTGRES_PORT}
-        PGHOST: ${POSTGRES_ISTAT_HOST}
+        PGHOST: ${POSTGRES_HOST}
         PGDB: ${POSTGRES_ISTAT_DB}
         PGUSER: ${POSTGRES_ISTAT_USER}
         PGPWD: ${POSTGRES_ISTAT_PASS}
