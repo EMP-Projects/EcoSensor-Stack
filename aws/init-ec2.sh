@@ -21,14 +21,18 @@ export POSTGRES_OSM_USER=osm
 export POSTGRES_OSM_PASS=
 export POSTGRES_OSM_DB=osm
 
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+sudo ./aws/install
+
 # Update and install packages
 sudo apt update
 
 # Install Open-Meteo-API, Docker, Istat and Osm2pgsql
-exec ./docker-install.sh
-exec ./om-install.sh
-exec ./istat-install.sh
-exec ./osm-install.sh
+sh ./docker-install.sh
+sh ./om-install.sh
+sh ./istat-install.sh
+sh ./osm-install.sh
 
 # -----------------------------------
 # Install and configure postgresql
@@ -80,7 +84,7 @@ echo "random_page_cost=1.0" | sudo tee -a /etc/postgresql/14/main/postgresql.con
 sudo systemctl restart postgresql
 
 # import Istat data
-exec ./aws/istat-import.sh $POSTGRES_HOST $POSTGRES_PORT $POSTGRES_ISTAT_USER $POSTGRES_ISTAT_PASS $POSTGRES_ISTAT_DB
+sh ./aws/istat-import.sh $POSTGRES_HOST $POSTGRES_PORT $POSTGRES_ISTAT_USER $POSTGRES_ISTAT_PASS $POSTGRES_ISTAT_DB
 
 # import OSM data
-exec ./aws/osm-import.sh $POSTGRES_HOST $POSTGRES_PORT $POSTGRES_OSM_USER $POSTGRES_OSM_PASS $POSTGRES_OSM_DB
+sh ./aws/osm-import.sh $POSTGRES_HOST $POSTGRES_PORT $POSTGRES_OSM_USER $POSTGRES_OSM_PASS $POSTGRES_OSM_DB
