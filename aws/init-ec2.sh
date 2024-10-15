@@ -1,5 +1,9 @@
 #!/bin/bash
 
+export AWS_DEFAULT_REGION=eu-east-1
+export AWS_ACCESS_KEY_ID=
+export AWS_SECRET_ACCESS_KEY=
+
 # Database
 export POSTGRES_HOST=localhost
 export POSTGRES_PORT=5432
@@ -19,45 +23,30 @@ export POSTGRES_OSM_DB=osm
 
 # Update and install packages
 sudo apt update
-sudo apt install -y git docker.io
 
-# -----------------------------------
-# Install Docker Compose
-sudo usermod -a -G docker ubuntu
-id ubuntu
-# Reload a Linux user's group assignments to docker w/o logout
-newgrp docker
-
-DOCKER_CONFIG=${DOCKER_CONFIG:-$HOME/.docker}
-mkdir -p $DOCKER_CONFIG/cli-plugins
-curl -SL https://github.com/docker/compose/releases/download/v2.29.6/docker-compose-linux-x86_64 -o $DOCKER_CONFIG/cli-plugins/docker-compose
-chmod +x $DOCKER_CONFIG/cli-plugins/docker-compose
-
-sudo systemctl enable docker.service
-sudo systemctl start docker.service
-
-# -----------------------------------
-# Install Open-Meteo-API
-sudo mkdir $HOME/.gnupg
-sudo gpg --keyserver hkps://keys.openpgp.org --no-default-keyring --keyring /usr/share/keyrings/openmeteo-archive-keyring.gpg  --recv-keys E6D9BD390F8226AE
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/openmeteo-archive-keyring.gpg] https://apt.open-meteo.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/openmeteo-api.list
-
-sudo apt update
-sudo apt install -y openmeteo-api
-
-# Download the latest ECMWF IFS 0.4° open-data forecast for temperature (50 MB)
-sudo chown -R $(id -u):$(id -g) /var/lib/openmeteo-api
-cd /var/lib/openmeteo-api
-openmeteo-api sync ncep_gfs013,copernicus_era5,copernicus_dem90,cams_europe temperature_2m,precipitation,carbon_monoxide,nitrogen_dioxide,ozone,pm10,pm2_5
-
-sudo systemctl status openmeteo-api
-sudo systemctl restart openmeteo-api
-sudo journalctl -u openmeteo-api.service
+# Install Open-Meteo-API, Docker, Istat and Osm2pgsql
+exec ./aws/docker-install.sh
+exec ./aws/om-install.sh
+exec ./aws/istat-install.sh
+exec ./aws/osm-install.sh
 
 # -----------------------------------
 # Install and configure postgresql
 sudo apt update
 sudo apt install -y postgresql postgresql-client postgis
+
+# create user and database
+sudo -u postgres psql -c "CREATE USER $POSTGRES_USER WITH PASSWORD '$POSTGRES_PASS';"
+sudo -u postgres psql -c "CREATE DATABASE $POSTGRES_DB OWNER $POSTGRES_USER;"
+sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE $POSTGRES_DB TO $POSTGRES_USER;"
+
+sudo -u postgres psql -c "CREATE USER $POSTGRES_USER WITH PASSWORD '$POSTGRES_OSM_PASS';"
+sudo -u postgres psql -c "CREATE DATABASE $POSTGRES_OSM_DB OWNER $POSTGRES_OSM_USER;"
+sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE $POSTGRES_OSM_DB TO $POSTGRES_OSM_USER;"
+
+sudo -u postgres psql -c "CREATE USER $POSTGRES_ISTAT_USER WITH PASSWORD '$POSTGRES_ISTAT_PASS';"
+sudo -u postgres psql -c "CREATE DATABASE $POSTGRES_ISTAT_DB OWNER $POSTGRES_ISTAT_USER;"
+sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE $POSTGRES_ISTAT_DB TO $POSTGRES_ISTAT_USER;"
 
 # add extension postgis to the database
 sudo -u ubuntu psql -c "CREATE EXTENSION IF NOT EXISTS postgis;" -d $POSTGRES_OSM_DB
@@ -89,3 +78,9 @@ echo "random_page_cost=1.0" | sudo tee -a /etc/postgresql/14/main/postgresql.con
 
 # restart postgresql
 sudo systemctl restart postgresql
+
+# import Istat data
+exec ./aws/istat-import.sh $POSTGRES_HOST $POSTGRES_PORT $POSTGRES_ISTAT_USER $POSTGRES_ISTAT_PASS $POSTGRES_ISTAT_DB
+
+# import OSM data
+exec ./aws/osm-import.sh $POSTGRES_HOST $POSTGRES_PORT $POSTGRES_OSM_USER $POSTGRES_OSM_PASS $POSTGRES_OSM_DB

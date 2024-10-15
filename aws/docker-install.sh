@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # Update and install packages
-sudo apt update
 sudo apt install -y git docker.io
 
 # -----------------------------------
