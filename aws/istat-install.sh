@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # sync bucket s3 with local folder
-aws s3 sync s3://istat-data $HOME/istat-data
+aws s3 sync --region us-east-1 s3://istat-data $HOME/istat-data
 
 sudo add-apt-repository ppa:ubuntugis/ppa
 sudo apt update
