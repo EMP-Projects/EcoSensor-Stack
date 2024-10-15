@@ -25,10 +25,10 @@ export POSTGRES_OSM_DB=osm
 sudo apt update
 
 # Install Open-Meteo-API, Docker, Istat and Osm2pgsql
-exec ./aws/docker-install.sh
-exec ./aws/om-install.sh
-exec ./aws/istat-install.sh
-exec ./aws/osm-install.sh
+exec ./docker-install.sh
+exec ./om-install.sh
+exec ./istat-install.sh
+exec ./osm-install.sh
 
 # -----------------------------------
 # Install and configure postgresql
