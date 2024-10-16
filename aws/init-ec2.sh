@@ -25,14 +25,14 @@ export ECOSENSOR_PORT=80
 export ECOSENSOR_OPENMETEO_API=http://localhost:8080
 
 # Install Open-Meteo-API, Docker, Istat and Osm2pgsql
-sh ./docker-install.sh
-sh ./om-install.sh
-sh ./pg-install.sh
+sudo sh ./docker-install.sh
+sudo sh ./om-install.sh
+sudo sh ./pg-install.sh
 
 # import Istat data
-sh ./istat-install.sh
-sh ./istat-import.sh $POSTGRES_HOST $POSTGRES_PORT $POSTGRES_ISTAT_USER $POSTGRES_ISTAT_PASS $POSTGRES_ISTAT_DB
+sudo sh ./istat-install.sh
+sudo sh ./istat-import.sh $POSTGRES_HOST $POSTGRES_PORT $POSTGRES_ISTAT_USER $POSTGRES_ISTAT_PASS $POSTGRES_ISTAT_DB
 
 # import OSM data
-sh ./osm-install.sh
-sh ./osm-import.sh $POSTGRES_HOST $POSTGRES_PORT $POSTGRES_OSM_USER $POSTGRES_OSM_PASS $POSTGRES_OSM_DB
+sudo sh ./osm-install.sh
+sudo sh ./osm-import.sh $POSTGRES_HOST $POSTGRES_PORT $POSTGRES_OSM_USER $POSTGRES_OSM_PASS $POSTGRES_OSM_DB
