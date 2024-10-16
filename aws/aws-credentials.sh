@@ -16,5 +16,12 @@ aws_secret_access_key=$aws_client_secret
 region=$aws_region
 EOL
 
+cat <<EOL > ~/.aws/config
+[default]
+region=$aws_region
+output=json
+EOL
+
 # Set appropriate permissions for the credentials file
 chmod 600 ~/.aws/credentials
+chmod 600 ~/.aws/config
