@@ -1,8 +1,8 @@
 #!/bin/bash
 
-pg_pass=$(aws ssm get-parameter --with-decryption --name "ECOSENSOR_PG_PASS" --query "Parameter.Value" --output text) 
-pg_pass_osm=$(aws ssm get-parameter --with-decryption --name "ECOSENSOR_PG_PASS_OSM" --query "Parameter.Value" --output text) 
-pg_pass_istat=$(aws ssm get-parameter --with-decryption --name "ECOSENSOR_PG_PASS_ISTA" --query "Parameter.Value" --output text) 
+pg_pass=$(aws ssm get-parameter --with-decryption --region us-east-1 --name "ECOSENSOR_PG_PASS" --query "Parameter.Value" --output text) 
+pg_pass_osm=$(aws ssm get-parameter --with-decryption --region us-east-1 --name "ECOSENSOR_PG_PASS_OSM" --query "Parameter.Value" --output text) 
+pg_pass_istat=$(aws ssm get-parameter --with-decryption --region us-east-1 --name "ECOSENSOR_PG_PASS_ISTA" --query "Parameter.Value" --output text) 
 
 # Database
 export POSTGRES_HOST=localhost
