@@ -8,3 +8,5 @@ sudo ./aws/install
 sudo sh ./docker-install.sh
 sudo sh ./om-install.sh
 sudo sh ./pg-install.sh
+sudo sh ./istat-install.sh
+sudo sh ./osm-install.sh

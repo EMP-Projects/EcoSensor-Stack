@@ -24,3 +24,51 @@ sudo make install-gen
 python3 -m venv /venv
 export PATH="/venv/bin:$PATH"
 pip install osmium psycopg2
+
+# Database Osm2pgsql
+export POSTGRES_OSM_PASS=$(aws ssm get-parameter --with-decryption --region us-east-1 --profile default --name "ECOSENSOR_OSM_PASS" --query "Parameter.Value" --output text) 
+
+sudo -u ubuntu psql -c "CREATE USER osm WITH PASSWORD '$POSTGRES_OSM_PASS';"
+sudo -u ubuntu psql -c "CREATE DATABASE osm OWNER osm;"
+sudo -u ubuntu psql -c "GRANT ALL PRIVILEGES ON DATABASE osm TO osm;"
+
+
+# add extension postgis to the database
+sudo -u ubuntu psql -c "CREATE EXTENSION IF NOT EXISTS postgis;" -d osm
+sudo -u ubuntu psql -c "CREATE EXTENSION IF NOT EXISTS hstore;" -d osm
+sudo -u ubuntu psql -c "CREATE EXTENSION IF NOT EXISTS pgrouting;" -d osm
+sudo -u ubuntu psql -c "CREATE EXTENSION IF NOT EXISTS postgis_raster;" -d osm
+sudo -u ubuntu psql -c "CREATE EXTENSION IF NOT EXISTS postgis_topology WITH SCHEMA topology;" -d osm
+
+echo DATADIR="${DATADIR:="/osm"}"
+echo PBF="${PBF:=$DATADIR/italy-latest.osm.pbf}"
+
+echo URLOSM="https://download.geofabrik.de/europe/italy-latest.osm.pbf"
+
+if [[ -f "$PBF" ]]; then
+    echo "Using local file at $PBF"
+else
+    echo "$PBF File not found, downloading..."
+    exec wget -O "${PBF}" https://download.geofabrik.de/europe/italy-latest.osm.pbf 
+    exec chmod 777 "${PBF}"
+fi
+
+osm2pgsql -v \
+    -j \
+    -c \
+    -s \
+    -C 4000 \
+    -x \
+    -S /usr/local/share/osm2pgsql/custom.style \
+    -H localhost \
+    -d osm \
+    -U osm \
+    -P 5432 \
+    "$PBF"
+
+osm2pgsql-replication init \
+    -H localhost \
+    -d osm \
+    -U osm \
+    -P 5432 \
+    --osm-file "$PBF"
