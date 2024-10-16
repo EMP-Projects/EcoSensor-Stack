@@ -5,20 +5,18 @@ pg_pass_osm=$(aws ssm get-parameter --with-decryption --region us-east-1 --profi
 pg_pass_istat=$(aws ssm get-parameter --with-decryption --region us-east-1 --profile default --name "ECOSENSOR_PG_PASS_ISTA" --query "Parameter.Value" --output text) 
 
 # Database
-export POSTGRES_HOST=localhost
-export POSTGRES_PORT=5432
 export POSTGRES_USER=ecosensor
-export POSTGRES_PASS="$pg_pass"
+export POSTGRES_PASS=$pg_pass
 export POSTGRES_DB=ecosensor
 
 # Database Istat
 export POSTGRES_ISTAT_USER=istat
-export POSTGRES_ISTAT_PASS="$pg_pass_istat"
+export POSTGRES_ISTAT_PASS=$pg_pass_istat
 export POSTGRES_ISTAT_DB=istat
 
 # Database Osm2pgsql
 export POSTGRES_OSM_USER=osm
-export POSTGRES_OSM_PASS="$pg_pass_osm"
+export POSTGRES_OSM_PASS=$pg_pass_osm
 export POSTGRES_OSM_DB=osm
 
 # -----------------------------------
@@ -69,3 +67,11 @@ echo "random_page_cost=1.0" | sudo tee -a /etc/postgresql/14/main/postgresql.con
 
 # restart postgresql
 sudo systemctl restart postgresql
+
+# import Istat data
+sudo sh ./istat-install.sh
+sudo sh ./istat-import.sh localhost 5432 $POSTGRES_ISTAT_USER $POSTGRES_ISTAT_PASS $POSTGRES_ISTAT_DB
+
+# import OSM data
+sudo sh ./osm-install.sh
+sudo sh ./osm-import.sh localhost 5432 $POSTGRES_OSM_USER $POSTGRES_OSM_PASS $POSTGRES_OSM_DB
