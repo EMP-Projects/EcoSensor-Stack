@@ -1,24 +1,43 @@
 #!/bin/bash
 
-export AWS_DEFAULT_REGION=eu-east-1
-export AWS_ACCESS_KEY_ID=
-export AWS_SECRET_ACCESS_KEY=
+# Read a parameter from AWS Systems Manager Parameter Store
+aws_client_id=$(aws ssm get-parameter --with-decryption --name "ECOSENSOR_AWS_CLIENT_ID" --query "Parameter.Value" --output text) 
+aws_client_secret=$(aws ssm get-parameter --with-decryption --name "ECOSENSOR_AWS_CLIENT_SECRET" --query "Parameter.Value" --output text) 
+aws_region=$(aws ssm get-parameter --name "ECOSENSOR_AWS_REGION" --query "Parameter.Value" --output text) 
+aws_topic_arc=$(aws ssm get-parameter --with-decryption --name "ECOSENSOR_AWS_TOPIC_ARN" --query "Parameter.Value" --output text) 
+aws_bucket_name_data=$(aws ssm get-parameter --with-decryption --name "ECOSENSOR_AWS_BUCKET_NAME_DATA" --query "Parameter.Value" --output text) 
+pg_pass=$(aws ssm get-parameter --with-decryption --name "ECOSENSOR_PG_PASS" --query "Parameter.Value" --output text) 
+pg_pass_osm=$(aws ssm get-parameter --with-decryption --name "ECOSENSOR_PG_PASS_OSM" --query "Parameter.Value" --output text) 
+pg_pass_istat=$(aws ssm get-parameter --with-decryption --name "ECOSENSOR_PG_PASS_ISTA" --query "Parameter.Value" --output text) 
+github_token=$(aws ssm get-parameter --with-decryption --name "GITHUB_TOKEN" --query "Parameter.Value" --output text) 
+
+# Export the parameter value as an environment variable
+export AWS_TOPIC_ARN="$parameter_value"
+export AWS_BUCKET_NAME="$aws_bucket_name_data"
+export AWS_ACCESS_KEY_ID="$aws_client_id"
+export AWS_SECRET_ACCESS_KEY="$aws_client_secret"
+export AWS_DEFAULT_REGION="$aws_region"
+export GITHUB_TOKEN="$github_token"
+
+# Backend API
+export ECOSENSOR_PORT=80
+export ECOSENSOR_OPENMETEO_API=http://localhost:8080
 
 # Database
 export POSTGRES_HOST=localhost
 export POSTGRES_PORT=5432
 export POSTGRES_USER=ecosensor
-export POSTGRES_PASS=
+export POSTGRES_PASS="$pg_pass"
 export POSTGRES_DB=ecosensor
 
 # Database Istat
 export POSTGRES_ISTAT_USER=istat
-export POSTGRES_ISTAT_PASS=
+export POSTGRES_ISTAT_PASS="$pg_pass_istat"
 export POSTGRES_ISTAT_DB=istat
 
 # Database Osm2pgsql
 export POSTGRES_OSM_USER=osm
-export POSTGRES_OSM_PASS=
+export POSTGRES_OSM_PASS="$pg_pass_osm"
 export POSTGRES_OSM_DB=osm
 
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"

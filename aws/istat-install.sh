@@ -1,7 +1,13 @@
 #!/bin/bash
 
+aws_bucket_name_istat=$(aws ssm get-parameter --with-decryption --name "ECOSENSOR_AWS_BUCKET_NAME_ISTAT" --query "Parameter.Value" --output text)
+export AWS_BUCKET_NAME_ISTAT="$aws_bucket_name_istat"
+
+aws_region=$(aws ssm get-parameter --with-decryption --name "ECOSENSOR_AWS_REGION" --query "Parameter.Value" --output text) 
+export AWS_DEFAULT_REGION="$aws_region"
+
 # sync bucket s3 with local folder
-aws s3 sync --region us-east-1 s3://istat-data $HOME/istat-data
+aws s3 sync --region $AWS_DEFAULT_REGION s3://$AWS_BUCKET_NAME_ISTAT $HOME/istat-data
 
 sudo add-apt-repository ppa:ubuntugis/ppa
 sudo apt update
