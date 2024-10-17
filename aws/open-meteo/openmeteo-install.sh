@@ -2,12 +2,11 @@
 
 # -----------------------------------
 # Install Open-Meteo-API
-sudo mkdir /root/.gnupg
-sudo gpg --keyserver hkps://keys.openpgp.org --no-default-keyring --keyring /usr/share/keyrings/openmeteo-archive-keyring.gpg  --recv-keys E6D9BD390F8226AE
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/openmeteo-archive-keyring.gpg] https://apt.open-meteo.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/openmeteo-api.list
+gpg --keyserver hkps://keys.openpgp.org --no-default-keyring --keyring /usr/share/keyrings/openmeteo-archive-keyring.gpg  --recv-keys E6D9BD390F8226AE
+sudo echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/openmeteo-archive-keyring.gpg] https://apt.open-meteo.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/openmeteo-api.list
 
 sudo apt update
-sudo apt install -y openmeteo-api
+sudo apt install -y gdal openmeteo-api
 
 # Download the latest ECMWF IFS 0.4° open-data forecast for temperature (50 MB)
 sudo chown -R $(id -u):$(id -g) /var/lib/openmeteo-api
