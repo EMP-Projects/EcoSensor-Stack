@@ -24,12 +24,12 @@ sudo -u postgres psql -c "CREATE EXTENSION IF NOT EXISTS postgis_topology;" -d e
 
 # dimmi il comando per aggiungere queste opzioni di configurazione a postgresql.conf
 # add configuration options to postgresql.conf
-sudo echo "shared_buffers=1GB" | sudo tee -a /etc/postgresql/14/main/postgresql.conf
-echo "work_mem=50MB" | sudo tee -a /etc/postgresql/14/main/postgresql.conf
-echo "maintenance_work_mem=2GB" | sudo tee -a /etc/postgresql/14/main/postgresql.conf
-echo "autovacuum_work_mem=1GB" | sudo tee -a /etc/postgresql/14/main/postgresql.conf
-echo "wal_level=minimal" | sudo tee -a /etc/postgresql/14/main/postgresql.conf
-echo "checkpoint_completion_target=0.9" | sudo tee -a /etc/postgresql/14/main/postgresql.conf
-echo "max_wal_senders=0" | sudo tee -a /etc/postgresql/14/main/postgresql.conf
-echo "random_page_cost=1.0" | sudo tee -a /etc/postgresql/14/main/postgresql.conf
+sudo echo "shared_buffers=512MB" | sudo tee -a /etc/postgresql/16/main/postgresql.conf
+echo "work_mem=50MB" | sudo tee -a /etc/postgresql/16/main/postgresql.conf
+echo "maintenance_work_mem=512MB" | sudo tee -a /etc/postgresql/16/main/postgresql.conf
+echo "autovacuum_work_mem=512MB" | sudo tee -a /etc/postgresql/16/main/postgresql.conf
+echo "wal_level=minimal" | sudo tee -a /etc/postgresql/16/main/postgresql.conf
+echo "checkpoint_completion_target=0.9" | sudo tee -a /etc/postgresql/16/main/postgresql.conf
+echo "max_wal_senders=0" | sudo tee -a /etc/postgresql/16/main/postgresql.conf
+echo "random_page_cost=1.0" | sudo tee -a /etc/postgresql/16/main/postgresql.conf
 
