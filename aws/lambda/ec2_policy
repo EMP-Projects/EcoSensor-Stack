@@ -1,0 +1,57 @@
+
+import json
+
+
+# Create an IAM policy
+    iam_client = boto3.client('iam')
+
+    policy_document = {
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Effect": "Allow",
+                "Action": [
+                    "ec2:DescribeInstances",
+                    "ec2:StartInstances",
+                    "ec2:StopInstances"
+                ],
+                "Resource": "*"
+            }
+        ]
+    }
+
+    policy_response = iam_client.create_policy(
+        PolicyName='LambdaEC2StartStopPolicy',
+        PolicyDocument=json.dumps(policy_document)
+    )
+
+    policy_arn = policy_response['Policy']['Arn']
+
+    # Create an IAM role
+    role_document = {
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Effect": "Allow",
+                "Principal": {
+                    "Service": "lambda.amazonaws.com"
+                },
+                "Action": "sts:AssumeRole"
+            }
+        ]
+    }
+
+    role_response = iam_client.create_role(
+        RoleName='LambdaEC2StartStopRole',
+        AssumeRolePolicyDocument=json.dumps(role_document)
+    )
+
+    role_arn = role_response['Role']['Arn']
+
+    # Attach the policy to the role
+    iam_client.attach_role_policy(
+        RoleName='LambdaEC2StartStopRole',
+        PolicyArn=policy_arn
+    )
+
+    print(f'Created IAM role with ARN: {role_arn}')
