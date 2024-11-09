@@ -2,6 +2,7 @@
 
 # Database
 export POSTGRES_PASS=$(aws ssm get-parameter --with-decryption --region us-east-1 --profile default --name "ECOSENSOR_PG_PASS" --query "Parameter.Value" --output text)
+export ECOSENSORDB=$(aws ssm get-parameter --region us-east-1 --profile default --name "ECOSENSOR_DB" --query "Parameter.Value" --output text)
 
 # -----------------------------------
 # Install and configure postgresql
@@ -12,9 +13,9 @@ sudo apt install -y postgresql postgresql-client postgis
 sudo systemctl restart postgresql
 
 # create user and database
-sudo -u postgres psql -c "CREATE USER ecosensor WITH PASSWORD '$POSTGRES_PASS';"
-sudo -u postgres psql -c "CREATE DATABASE ecosensor OWNER ecosensor;"
-sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE ecosensor TO ecosensor;"
+sudo -u postgres psql -c "CREATE USER $ECOSENSORDB WITH PASSWORD '$POSTGRES_PASS';"
+sudo -u postgres psql -c "CREATE DATABASE $ECOSENSORDB OWNER $ECOSENSORDB;"
+sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE $ECOSENSORDB TO $ECOSENSORDB;"
 
 sudo -u postgres psql -c "CREATE EXTENSION IF NOT EXISTS postgis;" -d ecosensor
 sudo -u postgres psql -c "CREATE EXTENSION IF NOT EXISTS hstore;" -d ecosensor
