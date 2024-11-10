@@ -22,7 +22,11 @@ sudo -u postgres psql postgresql://postgres:$PGPASS@$PGHOST:5432/postgres -c "CR
 sudo -u postgres psql postgresql://postgres:$PGPASS@$PGHOST:5432/postgres -c "CREATE EXTENSION IF NOT EXISTS postgis_raster;"
 sudo -u postgres psql postgresql://postgres:$PGPASS@$PGHOST:5432/postgres -c "CREATE EXTENSION IF NOT EXISTS postgis_topology;"
 
-echo DATADIR="${DATADIR:="/osm"}"
+echo DATADIR="${DATADIR:="$HOME/osm"}"
+if [[ ! -d "$DATADIR" ]]; then
+    echo "Directory $DATADIR does not exist. Creating..."
+    mkdir -p "$DATADIR"
+fi
 echo PBF="${PBF:=$DATADIR/italy-latest.osm.pbf}"
 echo URLOSM="https://download.geofabrik.de/europe/italy-latest.osm.pbf"
 
@@ -30,9 +34,17 @@ if [[ -f "$PBF" ]]; then
     echo "Using local file at $PBF"
 else
     echo "$PBF File not found, downloading..."
-    exec wget -O "${PBF}" https://download.geofabrik.de/europe/italy-latest.osm.pbf 
-    exec chmod 777 "${PBF}"
+    wget -O "${PBF}" https://download.geofabrik.de/europe/italy-latest.osm.pbf 
+
+    while [ ! -f "$PBF" ]; do
+        echo "Waiting for download to complete..."
+        sleep 5
+    done
+
+    chmod 777 "${PBF}"
 fi
+
+export PGPASSWORD=$PGPASS
 
 osm2pgsql -v \
     -j \
@@ -40,12 +52,11 @@ osm2pgsql -v \
     -s \
     -C 4000 \
     -x \
-    -S /usr/local/share/osm2pgsql/custom.style \
+    -S $HOME/osm/custom.style \
     -H $PGHOST \
     -d postgres \
     -U postgres \
     -P 5432 \
-    --schema=osm \
     "$PBF"
 
 osm2pgsql-replication init \
@@ -53,5 +64,4 @@ osm2pgsql-replication init \
     -d postgres \
     -U postgres \
     -P 5432 \
-    --schema=osm \
     --osm-file "$PBF"
