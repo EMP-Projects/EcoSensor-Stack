@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Create a file to store environment variables
-ENV_FILE=~/ecosensor_env.sh
+ENV_FILE=~/.ecosensor_rc
 
 # Check if the environment file exists, if so, delete it
 if [ -f "$ENV_FILE" ]; then
@@ -61,10 +61,18 @@ echo "export AWS_TOPIC_ARN=$TOPICARN" >> $ENV_FILE
 echo "export AWS_BUCKET_NAME=$BUCKETDATA" >> $ENV_FILE
 
 # Source the environment variables file in .bashrc
-echo "source $ENV_FILE" >> ~/.bashrc
+# echo "source $ENV_FILE" >> ~/.bashrc
 
 source ~/.bashrc
-
 echo "ECOSENSOR_OPENMETEO_API is set to $ECOSENSOR_OPENMETEO_API"
 
 # pull ecosensor code
+# Check if the ecosensor directory exists
+if [ ! -d "~/ecosensor" ]; then
+    echo "Directory ecosensor does not exist. Cloning repository..."
+    git clone https://github.com/EMP-Projects/EcoSensor ~/ecosensor
+else
+    echo "Directory ecosensor exists. Pulling latest changes..."
+    cd ~/ecosensor
+    git pull
+fi

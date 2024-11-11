@@ -46,7 +46,21 @@ fi
 
 export PGPASSWORD=$PGPASS
 
-osm2pgsql -v \
+if psql --no-password -h "$PGHOST" -U postgres -d postgres -p 5432 -c "select * from osm2pgsql_properties;"; then
+    echo "Updating."
+    osm2pgsql-replication update \
+        -v \
+        -H $PGHOST \
+        -d postgres \
+        -U postgres \
+        -P 5432 \
+        -- -j \
+        -S $HOME/osm/custom.style \
+        -x
+else
+    echo "Database not ready, need to initialize. Creating extensions ..."
+
+    osm2pgsql -v \
     -j \
     -c \
     -s \
@@ -59,9 +73,10 @@ osm2pgsql -v \
     -P 5432 \
     "$PBF"
 
-osm2pgsql-replication init \
-    -H $PGHOST \
-    -d postgres \
-    -U postgres \
-    -P 5432 \
-    --osm-file "$PBF"
+    osm2pgsql-replication init \
+        -H $PGHOST \
+        -d postgres \
+        -U postgres \
+        -P 5432 \
+        --osm-file "$PBF"
+fi
