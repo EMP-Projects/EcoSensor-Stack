@@ -1,7 +1,8 @@
-osm-data/
-ecosensor-data/
-openmeteo-data/
-istat-data/
+osm/
+ecosensor/
+openmeteo/
+istat/
 .idea/
 .DS_Store
 .env
+.env.aws

@@ -1,11 +1,6 @@
 #!/bin/bash
-
-sudo add-apt-repository -y ppa:ubuntugis/ppa
 sudo apt update
-sudo apt -y install gdal-bin python3 python3-venv python3-pip python3-dev libpq-dev postgresql
-export CPLUS_INCLUDE_PATH=/usr/include/gdal
-export C_INCLUDE_PATH=/usr/include/gdal
-pip install GDAL osmium psycopg2 numpy pandas matplotlib jupyterlab ipython-sql ipython jupyter_contrib_nbextensions geopandas
+sudo apt -y install osmium-tool gdal-bin python3 python3-venv python3-pip python3-dev libpq-dev postgresql
 
 # Database Istat
 export PGHOST=$(aws ssm get-parameter --with-decryption --region us-east-1 --profile default --name "ECOSENSOR_HOST" --query "Parameter.Value" --output text)
@@ -15,14 +10,10 @@ sudo -u postgres psql postgresql://postgres:$PGPASS@$PGHOST:5432/postgres -c "CR
 sudo -u postgres psql postgresql://postgres:$PGPASS@$PGHOST:5432/postgres -c "CREATE EXTENSION IF NOT EXISTS hstore;"
 sudo -u postgres psql postgresql://postgres:$PGPASS@$PGHOST:5432/postgres -c "CREATE EXTENSION IF NOT EXISTS postgis_topology;"
 
-aws_bucket_name_istat=$(aws ssm get-parameter --region us-east-1 --with-decryption --name "ECOSENSOR_AWS_BUCKET_NAME_ISTAT" --query "Parameter.Value" --output text)
-export AWS_BUCKET_NAME_ISTAT="$aws_bucket_name_istat"
-
-aws_region=$(aws ssm get-parameter --with-decryption --region us-east-1 --name "ECOSENSOR_AWS_REGION" --query "Parameter.Value" --output text) 
-export AWS_DEFAULT_REGION="$aws_region"
+export AWS_BUCKET_NAME_ISTAT=$(aws ssm get-parameter --region us-east-1 --with-decryption --name "ECOSENSOR_AWS_BUCKET_NAME_ISTAT" --query "Parameter.Value" --output text)
 
 # sync bucket s3 with local folder
-aws s3 sync --region $AWS_DEFAULT_REGION s3://$AWS_BUCKET_NAME_ISTAT $HOME/istat-data
+aws s3 sync --region us-east-1 s3://$AWS_BUCKET_NAME_ISTAT $HOME/istat-data
 
 # crea la cartella istat-data se non esiste
 if [ ! -d "$HOME/istat-data" ]; then
