@@ -1,8 +1,8 @@
+
 services:
   ecosensor-db:
     container_name: ecosensor-db
     image: postgis/postgis:16-3.4
-    profiles: ["all", "db"]
     env_file: .env.aws
     environment:
       PGPORT: 5432
@@ -21,7 +21,7 @@ services:
     networks:
       - ecosensor-network
     volumes:
-      - ./ecosensor-db/db:/var/lib/postgresql
+      - ./ecosensor/db:/var/lib/postgresql
 
   ecosensor-osm:
     build:
