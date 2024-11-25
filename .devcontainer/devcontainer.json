@@ -1,24 +1,32 @@
 {
-    "name": "EcoSensor-Stack Dev Container",
-    "image": "mcr.microsoft.com/vscode/devcontainers/base:ubuntu-20.04",
-    "features": {
-        "ghcr.io/devcontainers/features/docker-in-docker:1": {}
+    "name": "ecosensor stack",
+    "dockerComposeFile": "../docker-compose.yml",
+    "service": "ecosensor-db",
+    "workspaceFolder": "/workspace",
+    "settings": {
+        "terminal.integrated.shell.linux": "/bin/bash"
     },
     "customizations": {
         "vscode": {
             "extensions": [
                 "ms-python.python",
                 "ms-azuretools.vscode-docker",
-                "esbenp.prettier-vscode"
-            ],
-            "settings": {
-                "terminal.integrated.shell.linux": "/bin/bash"
-            }
+                "ms-vscode-remote.remote-containers"
+            ]
         }
     },
     "postCreateCommand": "pip install -r requirements.txt",
-    "mounts": [
-        "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
+    "remoteUser": "vscode",
+    "forwardPorts": [
+        5432,
+        8080
     ],
-    "remoteUser": "vscode"
+    "remoteEnv": {
+        "POSTGRES_DB": "${localEnv:POSTGRES_DB}",
+        "POSTGRES_USER": "${localEnv:POSTGRES_USER}",
+        "POSTGRES_PASS": "${localEnv:POSTGRES_PASS}",
+        "POSTGRES_PORT": "${localEnv:POSTGRES_PORT}",
+        "OPEN_METEO_PORT": "${localEnv:OPEN_METEO_PORT}",
+        "LOG_LEVEL": "${localEnv:LOG_LEVEL}"
+    }
 }
