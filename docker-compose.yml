@@ -3,7 +3,6 @@ services:
   ecosensor-db:
     container_name: ecosensor-db
     image: postgis/postgis:16-3.4
-    env_file: .env.aws
     environment:
       PGPORT: 5432
       POSTGRES_DB: ${POSTGRES_DB}
@@ -25,7 +24,6 @@ services:
 
   ecosensor-osm:
     container_name: ecosensor-osm
-    env_file: .env.aws
     image: ghcr.io/emp-projects/docker-osm2pgsq:main
     depends_on:
       ecosensor-db:
@@ -45,7 +43,6 @@ services:
   ecosensor-openmeteo-api:
     image: ghcr.io/open-meteo/open-meteo
     container_name: ecosensor-openmeteo-api
-    env_file: .env.aws
     ports:
       - ${OPEN_METEO_PORT}:8080
     command: serve
@@ -58,7 +55,6 @@ services:
   ecosensor-openmeteo-sync:
     image: ghcr.io/open-meteo/open-meteo
     container_name: ecosensor-openmeteo-sync
-    env_file: .env.aws
     command: sync ${OPEN_METEO_MODELS} ${OPEN_METEO_VARIABLES} --past-days ${OPEN_METEO_MAX_AGE_DAYS} --repeat-interval ${OPEN_METEO_REPEAT_INTERVAL} --concurrent ${OPEN_METEO_CONCURRENT}
     volumes:
       - ./openmeteo/sync:/app/data
@@ -71,7 +67,6 @@ services:
   ecosensor-istat:
     container_name: ecosensor-istat
     image: ghcr.io/emp-projects/docker-istat:main
-    env_file: .env.aws
     depends_on:
       ecosensor-db:
         condition: service_healthy
