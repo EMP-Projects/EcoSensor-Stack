@@ -6,3 +6,4 @@ istat/
 .DS_Store
 .env
 .env.aws
+.vscode/
