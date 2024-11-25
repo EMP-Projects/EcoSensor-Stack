@@ -24,12 +24,9 @@ services:
       - ./ecosensor/db:/var/lib/postgresql
 
   ecosensor-osm:
-    build:
-      context: .
-      dockerfile: Dockerfile.osm
     container_name: ecosensor-osm
     env_file: .env.aws
-    image: ecosensor/ecosensor-osm:latest
+    image: ghcr.io/emp-projects/docker-osm2pgsq:main
     depends_on:
       ecosensor-db:
         condition: service_healthy
@@ -73,10 +70,7 @@ services:
         
   ecosensor-istat:
     container_name: ecosensor-istat
-    build:
-      context: .
-      dockerfile: Dockerfile.istat
-    image: ecosensor/ecosensor-istat:latest
+    image: ghcr.io/emp-projects/docker-istat:main
     env_file: .env.aws
     depends_on:
       ecosensor-db:
